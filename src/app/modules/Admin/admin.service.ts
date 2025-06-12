@@ -1,26 +1,44 @@
-import { PrismaClient } from "../../../../generated/prisma";
+import { Prisma, PrismaClient } from "../../../../generated/prisma";
+import { adminSearchableFields } from "./admin.constants";
 
 const prisma = new PrismaClient();
 
-const getAllFromDB = async(params:any) =>{
-    console.log({params})
+const getAllFromDB = async(params:any, options:any) =>{
+    const { limit, page } = options;
+    const {searchTerm, ...filterData } =params;
+    
+    const andConditions: Prisma.AdminWhereInput[] = [];
+
+    if(params.searchTerm){
+        andConditions.push(
+            {
+            OR:adminSearchableFields.map(field =>({
+                 [field]:{
+                contains:params.searchTerm,
+                mode:'insensitive'
+            }
+            }))
+        }
+        )
+    }
+
+    // specific field like name, email
+
+    if(Object.keys(filterData).length>0){
+        andConditions.push({
+            AND: Object.keys(filterData).map(key =>({
+                [key]:{
+                    equals:filterData[key]
+                }
+            }))
+        })
+    }
+
+    const whereConditions:Prisma.AdminWhereInput = {AND:andConditions}
     const result = await prisma.admin.findMany({
-        where:{
-            OR:[
-                {
-            name:{
-                contains:params.searchTerm,
-                mode:'insensitive'
-            }
-        },
-        {
-            email:{
-                contains:params.searchTerm,
-                mode:'insensitive'
-            }
-        }
-            ]
-        }
+        where: whereConditions,
+        skip: (Number(page)-1)*Number(limit),
+        take:Number(limit)
     });
 
     return result;
