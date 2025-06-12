@@ -9,7 +9,6 @@ const getAllFromDB = async(req:Request, res:Response)=>{
         
         const filters = pick(req.query, adminFilterableFields);
         const options = pick(req.query, ['limit','page','sortBy','sortOrder']);
-        console.log(options)
 
         console.log("options",options)
 
@@ -18,7 +17,8 @@ const getAllFromDB = async(req:Request, res:Response)=>{
     res.status(200).json({
         success:true,
         message:"Admin data fetched!",
-        data:result
+        meta:result.meta,
+        data:result.data
     })
     } catch (err) {
         res.status(500).json({
