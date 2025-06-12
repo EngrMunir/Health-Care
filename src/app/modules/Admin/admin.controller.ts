@@ -10,8 +10,6 @@ const getAllFromDB = async(req:Request, res:Response)=>{
         const filters = pick(req.query, adminFilterableFields);
         const options = pick(req.query, ['limit','page','sortBy','sortOrder']);
 
-        console.log("options",options)
-
         const result = await AdminService.getAllFromDB(filters,options);
     
     res.status(200).json({
@@ -29,6 +27,48 @@ const getAllFromDB = async(req:Request, res:Response)=>{
     }
 }
 
+const getByIdFromDB = async(req:Request, res:Response) =>{
+    // console.log(req.params.id);
+    const {id} = req.params;
+    try {
+        const result = await AdminService.getByIdFromDB(id);
+         res.status(200).json({
+         success:true,
+         message:"Admin data fetched!",
+         data:result
+    })
+    } catch (err) {
+      res.status(500).json({
+            success:false,
+            message:err?.name || "Something went wrong",
+            error:err
+        })   
+    }
+}
+
+const updateIntoDB = async(req:Request, res:Response)=>{
+
+    const {id} = req.params;
+    // console.log("id:",id);
+    // console.log("data:",req.body);
+    try {
+        const result = await AdminService.updateIntoDB(id, req.body);
+         res.status(200).json({
+         success:true,
+         message:"Admin data updated!",
+         data:result
+    })
+    } catch (err) {
+      res.status(500).json({
+            success:false,
+            message:err?.name || "Something went wrong",
+            error:err
+        })   
+    }
+}
+
 export const AdminController = {
     getAllFromDB,
+    getByIdFromDB,
+    updateIntoDB
 }
