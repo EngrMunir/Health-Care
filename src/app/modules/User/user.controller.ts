@@ -20,8 +20,6 @@ const createAdmin = async (req:Request, res:Response)=>{
 
 const createDoctor = async (req:Request, res:Response)=>{
 
-    // console.log("file",req.file)
-    // console.log("data",req.body.data)
         const result = await userService.createDoctor(req);
         
         sendResponse(res, {
@@ -33,7 +31,18 @@ const createDoctor = async (req:Request, res:Response)=>{
         
 };
 
+const createPatient = async (req:Request, res:Response)=>{
+        const result = await userService.createDoctor(req);
+        sendResponse(res, {
+            statusCode:httpStatus.OK,
+            success:true,
+            message:'Patient created successfully!',
+            data: result
+        })
+};
+
 export const userController ={
     createAdmin,
-    createDoctor
+    createDoctor,
+    createPatient,
 }
