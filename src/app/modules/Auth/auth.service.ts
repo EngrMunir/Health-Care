@@ -5,6 +5,8 @@ import prisma from "../../../shared/prisma"
 import * as bcrypt from 'bcrypt';
 import { Secret } from 'jsonwebtoken';
 import emailSender from "./emailSender";
+import ApiError from "../../errors/ApiError";
+import httpStatus from 'http-status';
 
 const loginUser = async(payload:{
     email:string,
@@ -138,9 +140,28 @@ const forgotPassword = async(payload:{email:string}) =>{
     // http://localhost:3000/reset-pass?email=abc@gmail.com&token=kjertsjfd
 }
 
+const resetPassword = async (token:string, payload:{id:string, password:string}) =>{
+    console.log({ token, payload })
+    const userData = await prisma.user.findUniqueOrThrow({
+        where:{
+            id:payload.id,
+            status:UserStatus.ACTIVE
+        }
+    });
+    const isValidToken = jwtHelpers.verifyToken(token, config.jwt.reset_pass_secret as Secret)
+
+    if(!isValidToken){
+        throw new ApiError(httpStatus.FORBIDDEN, "Forbidden")
+    }
+    // hash password
+
+    // update into database
+}
+
 export const AuthServices ={
     loginUser,
     refreshToken,
     changePassword,
-    forgotPassword
+    forgotPassword,
+    resetPassword
 }

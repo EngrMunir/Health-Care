@@ -14,6 +14,9 @@ const emailSender = async (
     user: config.emailSender.email,  //j account teke email user k pataben
     pass: config.emailSender.app_pass,
   },
+  tls:{
+    rejectUnauthorized:false
+  }
 });
 
   const info = await transporter.sendMail({
